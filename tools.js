@@ -1,10 +1,10 @@
-function randomInt(min, max) {
+function ri(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
-  return Math.floor(fxrand() * (max - min + 1) + min); // The maximum is exclusive and the minimum is inclusive
+  return Math.floor($fx.rand() * (max - min + 1) + min); // The maximum is exclusive and the minimum is inclusive
 }
-function randomVal(min, max) {
-  return fxrand() * (max - min) + min;
+function rv(min, max) {
+  return $fx.rand() * (max - min) + min;
 }
 function map_range(value, low1, high1, low2, high2) {
   return low2 + ((high2 - low2) * (value - low1)) / (high1 - low1);
@@ -15,7 +15,7 @@ function shuff(array) {
     randomIndex;
 
   while (currentIndex != 0) {
-    randomIndex = Math.floor(fxrand() * currentIndex);
+    randomIndex = Math.floor($fx.rand() * currentIndex);
     currentIndex--;
     [array[currentIndex], array[randomIndex]] = [
       array[randomIndex],
@@ -26,13 +26,9 @@ function shuff(array) {
   return array;
 }
 
-function setLineDash(list) {
-  drawingContext.setLineDash(list);
-}
-
 function keyTyped() {
   if (key === "s" || key === "S") {
-    save("TEMPEST"+fxhash);
+    save("img"+$fx.hash);
   }
   if (key === "1") {
     window.history.replaceState('', '', updateURLParameter(window.location.href, "size", "1"));
@@ -93,7 +89,7 @@ function updateURLParameter(url, param, paramVal)
 }
 
 function randColor() {
-  return chroma(truePal[randomInt(0, truePal.length-1)]).saturate(0).hex()
+  return truePal[ri(0, truePal.length-1)]
 }
 
 function angBetween(x1, y1, x2, y2) {
@@ -108,7 +104,7 @@ function ptFromAng(xPosition, yPosition, ang, dis) {
 }
 
 function plusOrMin(x) {
-  chance = fxrand() 
+  chance = $fx.rand() 
   if(chance < 0.5) {
     mod = 1
   } else {
@@ -125,15 +121,31 @@ function average(array) {
   });
   return sum / array.length;
 }
+
+function squarePolar(squareAng) {
+  return min(1 / abs(cos(squareAng)), 1 / abs(sin(squareAng)))
+}
 ////////////////////////////////////////
 
 function gradLUT() {
   scl = 200
-  thisPal = [frameCol, truePal[0], truePal[1], frameCol]
-    for(let y = 0; y < h; y+=w/scl) {
+  thisPal = []
+  numCols = truePal.length
+
+  colNum = 0
+  thisPal.push(frameCol)
+  for(let i = 0; i < numCols; i++) {
+    if(colNum > truePal.length-1) {
+      colNum = 0
+    }
+    thisPal.push(truePal[colNum])
+    colNum++
+  }  
+  thisPal.push(bgc)
+
+    for(let y = 0; y < h+1; y+=w/scl) {
       nY = map(y, 0, h, 0, 1)
-      // colScale = chroma.scale(truePal.slice(0, numColors))//.classes(20)
-      colScale = chroma.scale(thisPal).padding([-0.8, 0.0])
+      colScale = chroma.scale(thisPal)
       hueCol = colScale(nY).hex()
       col = hueCol
       g.stroke(col)
@@ -141,3 +153,15 @@ function gradLUT() {
       g.line(0, y, w,y)
     }
 }
+
+function cTexture() {
+  c.noStroke()
+  var ns = 0.01
+  for(let i = 0; i < 10000; i++) {
+    here = createVector(rv(0, w), rv(0, h))
+    val = noise(here.x*ns, here.y*ns)*255
+    c.fill(chroma(val,val,val).alpha(0.005+rv(-0.01, 0.01)).hex())
+    c.circle(rv(0, w), rv(0, h), rv(200, h/4))
+  }
+}
+

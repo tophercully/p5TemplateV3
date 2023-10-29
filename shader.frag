@@ -12,6 +12,7 @@ uniform sampler2D c;
 uniform vec2 u_resolution;
 uniform float seed;
 uniform vec3 bgc;
+uniform vec3 frameCol;
 uniform float marg;
 uniform float pxSize;
 uniform bool firstPass;
@@ -43,30 +44,61 @@ vec3 adjustBrightness(vec3 color, float value) {
   return color + value;
 }
 
-float noise (in vec2 st) {
-    vec2 i = floor(st);
-    vec2 f = fract(st);
-
-    // Four corners in 2D of a tile
-    float a = random(i);
-    float b = random(i + vec2(1.0, 0.0));
-    float c = random(i + vec2(0.0, 1.0));
-    float d = random(i + vec2(1.0, 1.0));
-
-    // Smooth Interpolation
-
-    // Cubic Hermine Curve.  Same as SmoothStep()
-    vec2 u = f*f*(3.0-2.0*f);
-    // u = smoothstep(0.,1.,f);
-
-    // Mix 4 coorners percentages
-    return mix(a, b, u.x) +
-            (c - a)* u.y * (1.0 - u.x) +
-            (d - b) * u.x * u.y;
-}
-
 mat2 rotate(float angle){
     return mat2(cos(angle),-sin(angle),sin(angle),cos(angle));
+}
+
+float noise( in vec2 p )
+{
+    vec2 id = floor( p );
+    vec2 f = fract( p );
+	
+	vec2 u = f*f*(3.0-2.0*f);
+
+    return mix(mix(random(id + vec2(0.0,0.0)), 
+                   random(id + vec2(1.0,0.0)), u.x),
+               mix(random(id + vec2(0.0,1.0)), 
+                   random(id + vec2(1.0,1.0)), u.x), 
+               u.y);
+}
+
+float fbm( vec2 p )
+{
+    float f = 0.0;
+    float gat = 0.0;
+    
+    for (float octave = 0.; octave < 6.; ++octave)
+    {
+        float la = pow(2.0, octave);
+        float ga = pow(0.5, octave + 1.);
+        f += ga*noise( la * p ); 
+        gat += ga;
+    }
+    
+    f = f/gat;
+    
+    return f;
+}
+
+float noise_fbm(vec2 p)
+{
+    float h = fbm(0.09 + p + fbm(0.065 + 2.0 * p - 5.0 * fbm(4.0 * p)));  
+    return h; 
+}
+
+//inspired by jorgemaog on shadertoy https://www.shadertoy.com/view/WslcR2
+float outline(vec2 p, float eps)
+{
+    float f = noise_fbm(p - vec2(0.0, 0.0));
+    
+    float ft = noise_fbm(p - vec2(0.0, eps));
+    float fl = noise_fbm(p - vec2(eps, 0.0));
+    float fb = noise_fbm(p + vec2(0.0, eps));
+    float fr = noise_fbm(p + vec2(eps, 0.0));
+    
+    float gg = clamp(abs(4. * f - ft - fr - fl - fb), 0., 1.);
+    
+    return gg;
 }
 
 
@@ -97,6 +129,7 @@ void main() {
   vec4 texC = texture2D(c, st);
   vec4 texG = texture2D(g, st);
   vec4 texP = texture2D(p, st);
+  vec4 debugP = texture2D(p, stDebug);
   
   //map luminance as a y value on our gradient
   vec2 lum = vec2(0.5, texP.r);
@@ -113,21 +146,14 @@ void main() {
     color = colVal.rgb;
   }
 
+  
+
   //Draw margin, use 0 and 1 since we shrunk stB
   if(stB.x <= 0.0 || stB.x >= 1.0 || stB.y <= 0.0 || stB.y >= 1.0) {
     color = bgc;
   }
 
-  //luminance of C controls opacity of detail
-  float mixAmt = map(texC.r, 0.0, 0.3, 0.0, 1.0);
-  //apply color on last pass and only if its the foreground elements
-  if(lastPass == false && texC.r < 0.3) {
-    color = mix(bgc.rgb, color.rgb, mixAmt);
-  }
-
   if(lastPass == true) {
-    color = mix(bgc.rgb, color.rgb, texC.r);
-  
     if(texP.r > 0.5) {
       if(texC.r < 1.0) {
         color = adjustSaturation(color, 0.5);
@@ -138,6 +164,10 @@ void main() {
     float noiseGray = random(st.xy)*0.1;
     color += noiseGray;
   }
+
+
+  //default+debug
+  color = debugP.rgb;
 
   gl_FragColor = vec4(color, 1.0);
 }

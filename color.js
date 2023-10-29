@@ -24,7 +24,7 @@ bgNames = [
   "Raisin Black",
 ];
 //Background color parameters
-bgNum = randomInt(0, 9);
+bgNum = ri(0, 9);
 bgc = '#ECECEE'//bgCols[bgNum];
 bgName = bgNames[bgNum];
 
@@ -138,7 +138,7 @@ const palNames = [
 ];
 
 //Palette parameters
-palNum = randomInt(0, pals.length-1);
+palNum = ri(0, pals.length-1);
 pal = pals[palNum];
 palName = palNames[palNum];
 

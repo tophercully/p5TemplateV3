@@ -1,5 +1,5 @@
-w= 1600
-h = 2000
+w= 1748
+h = 2480
 marg = 100
 
 let shade;
@@ -15,9 +15,14 @@ if(url.searchParams.has('size') == true) {
 }
 pxSize = url.searchParams.get('size')
 
-//parameters
+
+//PARAMETERS
+//shader passes, default 0 unless recursing
 numPasses = 0
 
+
+
+//pass features
 $fx.features({
   "param1": 0,
   "param2": 0,
@@ -33,25 +38,25 @@ function setup() {
     pixelDensity(3)
   }
   recur = createGraphics(w, h, WEBGL)
-  canv = createGraphics(w, h)
   p = createGraphics(w, h)
   c = createGraphics(w, h)
   b = createGraphics(w, h)
   g = createGraphics(w, h)
   angleMode(DEGREES)
-  p.angleMode(DEGREES)
-  c.angleMode(DEGREES)
   noLoop()
-  p.noLoop()
-  c.noLoop()
 }
 
 function draw() {
-  background(bgc)
-  p.background('white')
+  p.background(0)
   c.background(0)
+  b.background(0)
 
   //Sketch
+  p.circle(w/2, h/2, h/2)
+
+
+
+  
 
   //Post processing
    lastPass = false
@@ -62,7 +67,7 @@ function draw() {
    shade.setUniform("p", p);
    shade.setUniform("g", g);
    shade.setUniform("c", c);
-   shade.setUniform("seed", randomVal(0, 10));
+   shade.setUniform("seed", rv(0, 10));
    shade.setUniform("marg", map(marg, 0, w, 0, 1));
    shade.setUniform("lastPass", lastPass)
    shade.setUniform("bgc", [
@@ -93,5 +98,5 @@ function draw() {
    image(recur, -w/2, -h/2)
 
    //render preview
-   fxpreview()
+   $fx.preview()
 }

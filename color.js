@@ -121,8 +121,26 @@ comboA = ["#142e70", "#f74d13"]
 comboE = ['#F57103', '#00598D', '#214C25']
 comboF = ['#de3be1', "#e9a32b"]
 
+testD = ["#F28989","#007428","#5F8CCB","#1950A9","#FDB302","#4C2C18","#B12424","#FE7B05"]
 
-const pals = [shepard, source, soft, mcWoot, comboE, comboA, comboF, burn, retroBaby, wildberry];
+testE = ["#FF7141","#FF79B3","#45A6C1","#F7991E","#372B2D","#CECCC9"]
+
+testG = ["#DC3B97","#180732","#067FC0","#F40931","#FF622F","#9A88C8"]
+
+mono = [bgc, frameCol, bgc, frameCol, bgc, frameCol, bgc, frameCol] 
+
+genM = ['#00a965', '#004a08', '#dfb9ff', '#eb2c00', '#8453ff', '#ff9c00']
+
+genX = ['#2b0028', '#f57600', '#000b00', '#003abe', '#791461', '#930000', '#509dff', '#006900']
+
+gen2 = ['#423395', '#000c01', '#a90000', '#ff6900', '#00612b', '#968ef9']
+
+gen10 = ['#006300', '#350000', '#d775cb', '#004f91', '#9e0000', '#5fb80b', '#15005f', '#73097d']
+
+
+
+const pals = [shepard, source, soft, mcWoot, comboE, comboA, comboF, burn, retroBaby, wildberry, 
+testD, testE, testG, mono, genM, genX, gen2, gen10];
 
 const palNames = [
   "Commander Shepard",

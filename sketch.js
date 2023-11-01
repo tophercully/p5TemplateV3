@@ -61,6 +61,7 @@ function draw() {
   //Post processing
    lastPass = false
    bgc = color(bgc)
+   frameCol = color(frameCol)
    recur.shader(shade)
    shade.setUniform("u_resolution", [w, h]);
    shade.setUniform("pxSize", pxSize)
@@ -75,6 +76,11 @@ function draw() {
      bgc.levels[1] / 255,
      bgc.levels[2] / 255,
    ]);
+   shade.setUniform("bgc", [
+    frameCol.levels[0] / 255,
+    frameCol.levels[1] / 255,
+    frameCol.levels[2] / 255,
+  ]);
 
    //recursive passes
    for(let i = 0; i < numPasses; i++) {

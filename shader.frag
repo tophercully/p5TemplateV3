@@ -113,10 +113,6 @@ void main() {
   st.y = 1.0 - st.y;
   stB.y = 1.0 - stB.y;
   stDebug.y = 1.0 - stDebug.y;
-
-  //form noise
-  st.xy += map(random(st.xy), 0.0, 1.0, -0.0005, 0.0005);
-
   
   if(lastPass == true) {
     //shrink stB so there is margin
@@ -139,12 +135,7 @@ void main() {
   //initialize color
   vec3 color = vec3(0.0);
   
-  //only apply color on the last pass, keep image black and white for now
-  if(lastPass == false) {
-    color = texP.rgb;
-  } else {
-    color = colVal.rgb;
-  }
+  color = texP.rgb;
 
   
 
